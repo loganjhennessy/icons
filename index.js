@@ -1,15 +1,25 @@
+"use strict";
+
+const fs = require('fs');
 const tools = require('@iconify/tools');
 
-tools.ImportSVG('handshake.svg').then(svg => {
-    // SVG was imported
-    // Variable 'svg' is instance of SVG class
-    console.log(svg.toString());
-    return tools.SVGO(svg);
-}).then(svgo => {
-    tools.ExportSVG(svgo, 'handshake-optimized.svg');
-    return tools.Scale(svgo, 4);
-}).then(svgScaled => {
-    tools.ExportPNG(svgScaled, 'handshake-optimized.png');
+// Create directories
+try {
+    fs.mkdirSync('dest');
+} catch (err) {
+}
+
+let collection;
+
+tools.ImportDir('src').then(result => {
+    collection = result;
+    return collection.promiseAll(svg => tools.SVGO(svg));
+}).then(() => {
+    return collection.promiseAll(svg => tools.Tags(svg))
+}).then(() => {
+    return tools.ExportDir(collection, 'dest');
+}).then(() => {
+    console.log('Parsed ' + collection.length() + ' icons.');
 }).catch(err => {
     console.error(err);
 });
