@@ -17,6 +17,8 @@ tools.ImportDir('src').then(result => {
 }).then(() => {
     return collection.promiseAll(svg => tools.Tags(svg))
 }).then(() => {
+    return collection.promiseAll(svg => tools.Scale(svg, 64 / svg.width));
+}).then(() => {
     return tools.ExportDir(collection, 'dest');
 }).then(() => {
     console.log('Parsed ' + collection.length() + ' icons.');
